@@ -264,18 +264,18 @@ class ResumableTrainer:
         return callbacks
 
     def _check_already_complete(self, epochs: int) -> bool:
-    """Return True only if training is complete AND no new epochs requested."""
-    if self.state.get('training_complete', False):
-        last_epoch = self.state.get('last_epoch', 0)
-        if epochs > last_epoch:
-            print(f" Previous run completed at epoch {last_epoch}, but epochs={epochs} — resuming for {epochs - last_epoch} more epochs.")
-            self.state['training_complete'] = False  # reset flag
-            return False
-        else:
-            print(" Training already complete! Nothing to resume.")
-            return True
-    return False
-
+        """Return True only if training is complete AND no new epochs requested."""
+        if self.state.get('training_complete', False):
+            last_epoch = self.state.get('last_epoch', 0)
+            if epochs > last_epoch:
+                print(f" Previous run completed at epoch {last_epoch}, but epochs={epochs} — resuming for {epochs - last_epoch} more epochs.")
+                self.state['training_complete'] = False  # reset flag
+                return False
+            else:
+                print(" Training already complete! Nothing to resume.")
+                return True
+        return False
+   
     # ── Public API ────────────────────────────────────────────
 
     def fit(self, train_data, val_data, epochs: int, **fit_kwargs):
