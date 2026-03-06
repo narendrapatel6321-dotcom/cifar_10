@@ -263,12 +263,18 @@ class ResumableTrainer:
 
         return callbacks
 
-    def _check_already_complete(self) -> bool:
-        """Return True if training was already marked complete."""
-        if self.state.get('training_complete', False):
+    def _check_already_complete(self, epochs: int) -> bool:
+    """Return True only if training is complete AND no new epochs requested."""
+    if self.state.get('training_complete', False):
+        last_epoch = self.state.get('last_epoch', 0)
+        if epochs > last_epoch:
+            print(f" Previous run completed at epoch {last_epoch}, but epochs={epochs} — resuming for {epochs - last_epoch} more epochs.")
+            self.state['training_complete'] = False  # reset flag
+            return False
+        else:
             print(" Training already complete! Nothing to resume.")
             return True
-        return False
+    return False
 
     # ── Public API ────────────────────────────────────────────
 
@@ -290,7 +296,7 @@ class ResumableTrainer:
         self.state = self._load_state()
 
         # 2. Check if already done
-        if self._check_already_complete():
+        if self._check_already_complete(epochs):
             return None
 
         # 3. Find latest checkpoint
